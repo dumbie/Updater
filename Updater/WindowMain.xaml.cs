@@ -111,14 +111,17 @@ namespace Updater
                                 else
                                 {
                                     //Ignore update files
+                                    bool skipFileExtraction = false;
                                     foreach (string fileName in updaterSettings.FilesIgnore)
                                     {
                                         if (File.Exists(extractPath) && extractPath.ToLower().EndsWith(fileName.ToLower()))
                                         {
                                             Debug.WriteLine("Skipping: " + fileName);
-                                            continue;
+                                            skipFileExtraction = true;
+                                            break;
                                         }
                                     }
+                                    if (skipFileExtraction) { continue; }
 
                                     //Rename and move the updater
                                     if (File.Exists(extractPath) && extractPath.ToLower().EndsWith("Updater.exe".ToLower()))

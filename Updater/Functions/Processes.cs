@@ -6,7 +6,7 @@ namespace Updater
     public class Processes
     {
         //Launch process as administrator
-        public static void ProcessStartAdmin(string fileName)
+        public static bool ProcessStartAdmin(string fileName)
         {
             try
             {
@@ -14,12 +14,13 @@ namespace Updater
                 {
                     startProcess.StartInfo.FileName = fileName;
                     startProcess.StartInfo.Verb = "RunAs";
-                    startProcess.Start();
+                    return startProcess.Start();
                 }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine("Failed to start process: " + ex.Message);
+                return false;
             }
         }
 
@@ -31,8 +32,12 @@ namespace Updater
                 bool processClosed = false;
                 foreach (Process closeProcess in Process.GetProcessesByName(processName))
                 {
-                    processClosed = true;
-                    closeProcess.Kill();
+                    try
+                    {
+                        closeProcess.Kill();
+                        processClosed = true;
+                    }
+                    catch { }
                 }
                 return processClosed;
             }
