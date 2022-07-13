@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
@@ -24,44 +25,26 @@ namespace Updater
         {
             try
             {
-                //Check resources directory
-                Directory_Create("Resources", false);
-
-                //Load updater settings
-                string updaterSettingsPath = @"Resources\Updater.json";
-                if (!File.Exists(updaterSettingsPath))
+                //Close running updater
+                if (Processes.ProcessClose("Updater"))
                 {
-                    Debug.WriteLine("Updater settings file missing.");
-                    await Application_Exit("Updater files missing, closing in a bit.");
-                    return;
+                    await Task.Delay(1000);
                 }
 
-                string updaterSettingsText = File.ReadAllText(updaterSettingsPath);
-                JavaScriptSerializer jsonSerializer = new JavaScriptSerializer();
-                UpdaterJson updaterSettings = jsonSerializer.Deserialize<UpdaterJson>(updaterSettingsText);
+                //Create resources directory
+                Directory_Create("Resources", false);
 
                 //Delete previous update files
                 TextBlockUpdate("Deleting update files.");
                 File_Delete("Resources/UpdaterReplace.exe");
                 File_Delete("Resources/AppUpdate.zip");
-                foreach (string fileName in updaterSettings.FilesDelete)
-                {
-                    File_Delete(fileName);
-                }
 
-                //Close running application
-                TextBlockUpdate("Closing running application.");
-                bool appRunning = false;
-                foreach (string processName in updaterSettings.ProcessClose)
+                //Load current updater settings
+                if (!LoadUpdaterSettings())
                 {
-                    if (Processes.ProcessClose(processName))
-                    {
-                        appRunning = true;
-                    }
+                    await Application_Exit("Updater settings missing, closing in a bit.");
+                    return;
                 }
-
-                //Wait for applications to have closed
-                await Task.Delay(1000);
 
                 //Set network security protocol
                 try
@@ -81,7 +64,7 @@ namespace Updater
                         webClient.Headers[HttpRequestHeader.UserAgent] = "Application Updater";
                         webClient.DownloadProgressChanged += WebClient_DownloadProgressChanged;
 
-                        Uri downloadUri = new Uri(ApiGitHub_GetDownloadPath(updaterSettings.RepoName, updaterSettings.AppName, updaterSettings.FileName), UriKind.RelativeOrAbsolute);
+                        Uri downloadUri = new Uri(ApiGitHub_GetDownloadPath(AppVariables.UpdaterSettings.RepoName, AppVariables.UpdaterSettings.AppName, AppVariables.UpdaterSettings.FileName), UriKind.RelativeOrAbsolute);
                         await webClient.DownloadFileTaskAsync(downloadUri, "Resources/AppUpdate.zip");
                         Debug.WriteLine("Update file has been downloaded.");
                     }
@@ -93,15 +76,65 @@ namespace Updater
                     return;
                 }
 
+                //Extract new updater settings
+                try
+                {
+                    Debug.WriteLine("Extracting latest updater settings.");
+                    TextBlockUpdate("Updating settings to the latest version.");
+                    using (ZipArchive zipArchive = ZipFile.OpenRead("Resources/AppUpdate.zip"))
+                    {
+                        ZipArchiveEntry zipFile = zipArchive.Entries.Where(x => x.FullName.ToLower().EndsWith("Resources/Updater.json".ToLower())).FirstOrDefault();
+                        string extractPath = AVFunctions.StringReplaceFirst(zipFile.FullName, AppVariables.UpdaterSettings.ExtractName + "/", string.Empty, false);
+
+                        //Extract the file
+                        zipFile.ExtractToFile(extractPath, true);
+                    }
+                }
+                catch
+                {
+                    Debug.WriteLine("Failed to extract latest settings file.");
+                }
+
+                //Load new updater settings
+                if (!LoadUpdaterSettings())
+                {
+                    await Application_Exit("Updater settings missing, closing in a bit.");
+                    return;
+                }
+
+                //Close running application
+                TextBlockUpdate("Closing running application.");
+                bool appRunning = false;
+                foreach (string processName in AppVariables.UpdaterSettings.ProcessClose)
+                {
+                    if (Processes.ProcessClose(processName))
+                    {
+                        appRunning = true;
+                    }
+                }
+
+                //Wait for applications to have closed
+                if (appRunning)
+                {
+                    await Task.Delay(1000);
+                }
+
+                //Delete unused files
+                TextBlockUpdate("Deleting unused files.");
+                foreach (string fileName in AppVariables.UpdaterSettings.FilesDelete)
+                {
+                    File_Delete(fileName);
+                }
+
                 //Extract the downloaded update archive
                 try
                 {
-                    TextBlockUpdate("Updating the application to the latest version.");
+                    TextBlockUpdate("Updating application to the latest version.");
                     using (ZipArchive zipArchive = ZipFile.OpenRead("Resources/AppUpdate.zip"))
                     {
                         foreach (ZipArchiveEntry zipFile in zipArchive.Entries)
                         {
-                            string extractPath = AVFunctions.StringReplaceFirst(zipFile.FullName, updaterSettings.ExtractName + "/", string.Empty, false);
+                            string extractPath = AVFunctions.StringReplaceFirst(zipFile.FullName, AppVariables.UpdaterSettings.ExtractName + "/", string.Empty, false);
                             if (!string.IsNullOrWhiteSpace(extractPath))
                             {
                                 if (string.IsNullOrWhiteSpace(zipFile.Name))
@@ -112,7 +145,7 @@ namespace Updater
                                 {
                                     //Ignore update files
                                     bool skipFileExtraction = false;
-                                    foreach (string fileName in updaterSettings.FilesIgnore)
+                                    foreach (string fileName in AppVariables.UpdaterSettings.FilesIgnore)
                                     {
                                         if (File.Exists(extractPath) && extractPath.ToLower().EndsWith(fileName.ToLower()))
                                         {
@@ -147,7 +180,7 @@ namespace Updater
                 if (appRunning)
                 {
                     TextBlockUpdate("Starting updated version of the application.");
-                    foreach (string executableName in updaterSettings.ProcessLaunch)
+                    foreach (string executableName in AppVariables.UpdaterSettings.ProcessLaunch)
                     {
                         Processes.ProcessStartAdmin(executableName);
                     }
@@ -160,6 +193,31 @@ namespace Updater
             {
                 //Close the application
                 await Application_Exit("Application update failed, closing in a bit.");
+            }
+        }
+
+        //Load updater settings
+        private bool LoadUpdaterSettings()
+        {
+            try
+            {
+                string updaterSettingsPath = @"Resources\Updater.json";
+                if (!File.Exists(updaterSettingsPath))
+                {
+                    return false;
+                }
+
+                string updaterSettingsText = File.ReadAllText(updaterSettingsPath);
+                JavaScriptSerializer jsonSerializer = new JavaScriptSerializer();
+                AppVariables.UpdaterSettings = jsonSerializer.Deserialize<UpdaterJson>(updaterSettingsText);
+
+                Debug.WriteLine("Loaded updater settings.");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Failed to load updater settings: " + ex.Message);
+                return false;
             }
         }
 

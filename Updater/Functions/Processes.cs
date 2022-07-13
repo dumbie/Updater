@@ -30,12 +30,16 @@ namespace Updater
             try
             {
                 bool processClosed = false;
+                Process currentProcess = Process.GetCurrentProcess();
                 foreach (Process closeProcess in Process.GetProcessesByName(processName))
                 {
                     try
                     {
-                        closeProcess.Kill();
-                        processClosed = true;
+                        if (closeProcess.Id != currentProcess.Id)
+                        {
+                            closeProcess.Kill();
+                            processClosed = true;
+                        }
                     }
                     catch { }
                 }
