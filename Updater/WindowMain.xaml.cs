@@ -64,7 +64,7 @@ namespace Updater
                         webClient.Headers[HttpRequestHeader.UserAgent] = "Application Updater";
                         webClient.DownloadProgressChanged += WebClient_DownloadProgressChanged;
 
-                        Uri downloadUri = new Uri(ApiGitHub_GetDownloadPath(AppVariables.UpdaterSettings.RepoName, AppVariables.UpdaterSettings.AppName, AppVariables.UpdaterSettings.FileName), UriKind.RelativeOrAbsolute);
+                        Uri downloadUri = GetPathLatestDownload(AppVariables.UpdaterSettings.UserName, AppVariables.UpdaterSettings.RepoName, AppVariables.UpdaterSettings.FileName);
                         await webClient.DownloadFileTaskAsync(downloadUri, "Resources/AppUpdate.zip");
                         Debug.WriteLine("Update file has been downloaded.");
                     }
