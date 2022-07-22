@@ -103,11 +103,14 @@ namespace Updater
                 //Close running application
                 TextBlockUpdate("Closing running application.");
                 bool appRunning = false;
-                foreach (string processName in AppVariables.UpdaterSettings.ProcessClose)
+                if (AppVariables.UpdaterSettings.ProcessClose != null)
                 {
-                    if (Processes.ProcessClose(processName))
+                    foreach (string processName in AppVariables.UpdaterSettings.ProcessClose)
                     {
-                        appRunning = true;
+                        if (Processes.ProcessClose(processName))
+                        {
+                            appRunning = true;
+                        }
                     }
                 }
 
@@ -118,17 +121,23 @@ namespace Updater
                 }
 
                 //Delete unused files
-                TextBlockUpdate("Deleting unused files.");
-                foreach (string fileName in AppVariables.UpdaterSettings.FilesDelete)
+                if (AppVariables.UpdaterSettings.FilesDelete != null)
                 {
-                    File_Delete(fileName);
+                    TextBlockUpdate("Deleting unused files.");
+                    foreach (string fileName in AppVariables.UpdaterSettings.FilesDelete)
+                    {
+                        File_Delete(fileName);
+                    }
                 }
 
                 //Delete unused folders
-                TextBlockUpdate("Deleting unused folders.");
-                foreach (string folderName in AppVariables.UpdaterSettings.FoldersDelete)
+                if (AppVariables.UpdaterSettings.FoldersDelete != null)
                 {
-                    Directory_Delete(folderName);
+                    TextBlockUpdate("Deleting unused folders.");
+                    foreach (string folderName in AppVariables.UpdaterSettings.FoldersDelete)
+                    {
+                        Directory_Delete(folderName);
+                    }
                 }
 
                 //Extract the downloaded update archive
@@ -150,22 +159,28 @@ namespace Updater
                                 {
                                     //Ignore update files and folders
                                     bool skipFileExtraction = false;
-                                    foreach (string fileName in AppVariables.UpdaterSettings.FilesIgnore)
+                                    if (AppVariables.UpdaterSettings.FilesIgnore != null)
                                     {
-                                        if (File.Exists(extractPath) && extractPath.ToLower().EndsWith(fileName.ToLower()))
+                                        foreach (string fileName in AppVariables.UpdaterSettings.FilesIgnore)
                                         {
-                                            Debug.WriteLine("Skipping file: " + extractPath);
-                                            skipFileExtraction = true;
-                                            break;
+                                            if (File.Exists(extractPath) && extractPath.ToLower().EndsWith(fileName.ToLower()))
+                                            {
+                                                Debug.WriteLine("Skipping file: " + extractPath);
+                                                skipFileExtraction = true;
+                                                break;
+                                            }
                                         }
                                     }
-                                    foreach (string folderName in AppVariables.UpdaterSettings.FoldersIgnore)
+                                    if (AppVariables.UpdaterSettings.FoldersIgnore != null)
                                     {
-                                        if (File.Exists(extractPath) && extractPath.ToLower().Contains(folderName.ToLower()))
+                                        foreach (string folderName in AppVariables.UpdaterSettings.FoldersIgnore)
                                         {
-                                            Debug.WriteLine("Skipping folder: " + extractPath);
-                                            skipFileExtraction = true;
-                                            break;
+                                            if (File.Exists(extractPath) && extractPath.ToLower().Contains(folderName.ToLower()))
+                                            {
+                                                Debug.WriteLine("Skipping folder: " + extractPath);
+                                                skipFileExtraction = true;
+                                                break;
+                                            }
                                         }
                                     }
                                     if (skipFileExtraction) { continue; }
@@ -194,9 +209,12 @@ namespace Updater
                 if (appRunning)
                 {
                     TextBlockUpdate("Starting updated version of the application.");
-                    foreach (string executableName in AppVariables.UpdaterSettings.ProcessLaunch)
+                    if (AppVariables.UpdaterSettings.ProcessLaunch != null)
                     {
-                        Processes.ProcessStartAdmin(executableName);
+                        foreach (string executableName in AppVariables.UpdaterSettings.ProcessLaunch)
+                        {
+                            Processes.ProcessStartAdmin(executableName);
+                        }
                     }
                 }
 
