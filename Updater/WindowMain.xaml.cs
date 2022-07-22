@@ -85,8 +85,6 @@ namespace Updater
                     {
                         ZipArchiveEntry zipFile = zipArchive.Entries.Where(x => x.FullName.ToLower().EndsWith("Resources/Updater.json".ToLower())).FirstOrDefault();
                         string extractPath = AVFunctions.StringReplaceFirst(zipFile.FullName, AppVariables.UpdaterSettings.ExtractName + "/", string.Empty, false);
-
-                        //Extract the file
                         zipFile.ExtractToFile(extractPath, true);
                     }
                 }
@@ -126,6 +124,13 @@ namespace Updater
                     File_Delete(fileName);
                 }
 
+                //Delete unused folders
+                TextBlockUpdate("Deleting unused folders.");
+                foreach (string folderName in AppVariables.UpdaterSettings.FoldersDelete)
+                {
+                    Directory_Delete(folderName);
+                }
+
                 //Extract the downloaded update archive
                 try
                 {
@@ -143,13 +148,22 @@ namespace Updater
                                 }
                                 else
                                 {
-                                    //Ignore update files
+                                    //Ignore update files and folders
                                     bool skipFileExtraction = false;
                                     foreach (string fileName in AppVariables.UpdaterSettings.FilesIgnore)
                                     {
                                         if (File.Exists(extractPath) && extractPath.ToLower().EndsWith(fileName.ToLower()))
                                         {
-                                            Debug.WriteLine("Skipping: " + fileName);
+                                            Debug.WriteLine("Skipping file: " + extractPath);
+                                            skipFileExtraction = true;
+                                            break;
+                                        }
+                                    }
+                                    foreach (string folderName in AppVariables.UpdaterSettings.FoldersIgnore)
+                                    {
+                                        if (File.Exists(extractPath) && extractPath.ToLower().Contains(folderName.ToLower()))
+                                        {
+                                            Debug.WriteLine("Skipping folder: " + extractPath);
                                             skipFileExtraction = true;
                                             break;
                                         }

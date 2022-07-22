@@ -10,5 +10,7 @@
         public string[] ProcessClose { get; set; }
         public string[] FilesIgnore { get; set; }
         public string[] FilesDelete { get; set; }
+        public string[] FoldersIgnore { get; set; }
+        public string[] FoldersDelete { get; set; }
     }
 }

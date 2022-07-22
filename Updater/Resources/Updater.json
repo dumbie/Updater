@@ -18,5 +18,7 @@
   ],
   "FilesDelete": [
     "Updater.exe.config"
-  ]
+  ],
+  "FoldersIgnore": [],
+  "FoldersDelete": []
 }
