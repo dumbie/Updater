@@ -9,5 +9,8 @@ namespace Updater
 
         //Settings
         public static UpdaterJson UpdaterSettings = new UpdaterJson();
+
+        //Startup
+        public static string[] StartupArguments = { };
     }
 }

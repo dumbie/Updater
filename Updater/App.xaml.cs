@@ -11,6 +11,12 @@ namespace Updater
         {
             try
             {
+                //Set application startup arguments
+                if (e.Args != null)
+                {
+                    AppVariables.StartupArguments = e.Args;
+                }
+
                 //Set the working directory to executable directory
                 Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
 

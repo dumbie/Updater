@@ -25,8 +25,16 @@ namespace Updater
         {
             try
             {
+                //Check launch arguments
+                bool argumentProcessLaunch = AppVariables.StartupArguments.Any(x => x.ToLower() == "-processlaunch");
+
                 //Close running updater
+                TextBlockUpdate("Closing running updater.");
                 if (Processes.ProcessClose("Updater"))
+                {
+                    await Task.Delay(1000);
+                }
+                if (Processes.ProcessClose("UpdaterReplace"))
                 {
                     await Task.Delay(1000);
                 }
@@ -47,6 +55,7 @@ namespace Updater
                 }
 
                 //Set network security protocol
+                TextBlockUpdate("Downloading update file.");
                 try
                 {
                     ServicePointManager.SecurityProtocol |= SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
@@ -140,6 +149,46 @@ namespace Updater
                     }
                 }
 
+                //Move files
+                if (AppVariables.UpdaterSettings.FilesMove != null)
+                {
+                    TextBlockUpdate("Moving files.");
+                    foreach (string[] fileName in AppVariables.UpdaterSettings.FilesMove)
+                    {
+                        File_Move(fileName[0], fileName[1], true);
+                    }
+                }
+
+                //Move folders
+                if (AppVariables.UpdaterSettings.FoldersMove != null)
+                {
+                    TextBlockUpdate("Moving folders.");
+                    foreach (string[] folderName in AppVariables.UpdaterSettings.FoldersMove)
+                    {
+                        Directory_Move(folderName[0], folderName[1], true);
+                    }
+                }
+
+                //Copy files
+                if (AppVariables.UpdaterSettings.FilesCopy != null)
+                {
+                    TextBlockUpdate("Copying files.");
+                    foreach (string[] fileName in AppVariables.UpdaterSettings.FilesCopy)
+                    {
+                        File_Copy(fileName[0], fileName[1], true);
+                    }
+                }
+
+                //Copy folders
+                if (AppVariables.UpdaterSettings.FoldersCopy != null)
+                {
+                    TextBlockUpdate("Copying folders.");
+                    foreach (string[] folderName in AppVariables.UpdaterSettings.FoldersCopy)
+                    {
+                        Directory_Copy(folderName[0], folderName[1], true);
+                    }
+                }
+
                 //Extract the downloaded update archive
                 try
                 {
@@ -206,7 +255,7 @@ namespace Updater
                 }
 
                 //Start application after the update has completed.
-                if (appRunning)
+                if (appRunning || argumentProcessLaunch)
                 {
                     TextBlockUpdate("Starting updated version of the application.");
                     if (AppVariables.UpdaterSettings.ProcessLaunch != null)

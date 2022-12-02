@@ -8,8 +8,6 @@
   ],
   "ProcessClose": [
     "AmbiPro",
-    "AmbiPro-Admin",
-    "AmbiPro-Launcher",
     "Launcher"
   ],
   "FilesIgnore": [
@@ -19,6 +17,22 @@
   "FilesDelete": [
     "Updater.exe.config"
   ],
-  "FoldersIgnore": [],
-  "FoldersDelete": []
+  "FilesMove": [
+    [ "MoveFile.txt", "MovedFile.txt" ]
+  ],
+  "FilesCopy": [
+    [ "CopyFile.txt", "CopiedFile.txt" ]
+  ],
+  "FoldersIgnore": [
+    "IgnoreFolder"
+  ],
+  "FoldersDelete": [
+    "DeleteFolder"
+  ],
+  "FoldersMove": [
+    [ "MoveFolder", "MovedFolder" ]
+  ],
+  "FoldersCopy": [
+    [ "CopyFolder", "CopiedFolder" ]
+  ]
 }

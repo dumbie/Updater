@@ -178,7 +178,7 @@
   <ItemGroup>
     <None Include="Properties\App.manifest" />
     <Content Include="Resources\Updater.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
