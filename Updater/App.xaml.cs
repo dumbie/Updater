@@ -1,27 +1,25 @@
-﻿using System.IO;
-using System.Reflection;
+﻿using System;
 using System.Windows;
 
 namespace Updater
 {
     public partial class App : Application
     {
-        //Application Startup
         protected override void OnStartup(StartupEventArgs e)
         {
             try
             {
+                //Resolve missing assembly dll files
+                AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolveEmbedded;
+
                 //Set application startup arguments
                 if (e.Args != null)
                 {
                     AppVariables.StartupArguments = e.Args;
                 }
 
-                //Set the working directory to executable directory
-                Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
-
-                //Open the application window
-                AppVariables.WindowMain.Show();
+                //Run application startup code
+                AppStartup();
             }
             catch { }
         }

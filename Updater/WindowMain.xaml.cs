@@ -6,8 +6,8 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net;
+using System.Text.Json;
 using System.Threading.Tasks;
-using System.Web.Script.Serialization;
 using System.Windows;
 using Updater.Classes;
 using static ArnoldVinkCode.ApiGitHub;
@@ -30,11 +30,11 @@ namespace Updater
 
                 //Close running updater
                 TextBlockUpdate("Closing running updater.");
-                if (Processes.ProcessClose("Updater"))
+                if (AVProcess.Close_ProcessesByName("Updater", true))
                 {
                     await Task.Delay(1000);
                 }
-                if (Processes.ProcessClose("UpdaterReplace"))
+                if (AVProcess.Close_ProcessesByName("UpdaterReplace", true))
                 {
                     await Task.Delay(1000);
                 }
@@ -56,14 +56,7 @@ namespace Updater
 
                 //Set network security protocol
                 TextBlockUpdate("Downloading update file.");
-                try
-                {
-                    ServicePointManager.SecurityProtocol |= SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine("Failed to set security protocol: " + ex.Message);
-                }
+                AVDownloader.UpdateWebSecurityProtocol();
 
                 //Download update from GitHub
                 try
@@ -116,7 +109,7 @@ namespace Updater
                 {
                     foreach (string processName in AppVariables.UpdaterSettings.ProcessClose)
                     {
-                        if (Processes.ProcessClose(processName))
+                        if (AVProcess.Close_ProcessesByName(processName, true))
                         {
                             appRunning = true;
                         }
@@ -234,7 +227,7 @@ namespace Updater
                                     }
                                     if (skipFileExtraction) { continue; }
 
-                                    //Rename and move the updater
+                                    //Rename and move updater executable
                                     if (File.Exists(extractPath) && extractPath.ToLower().EndsWith("Updater.exe".ToLower()))
                                     {
                                         Debug.WriteLine("Renaming Updater.exe to Resources/UpdaterReplace.exe");
@@ -262,7 +255,7 @@ namespace Updater
                     {
                         foreach (string executableName in AppVariables.UpdaterSettings.ProcessLaunch)
                         {
-                            Processes.ProcessStartAdmin(executableName);
+                            AVProcess.Launch_ShellExecute(executableName, "", "", true);
                         }
                     }
                 }
@@ -289,8 +282,7 @@ namespace Updater
                 }
 
                 string updaterSettingsText = File.ReadAllText(updaterSettingsPath);
-                JavaScriptSerializer jsonSerializer = new JavaScriptSerializer();
-                AppVariables.UpdaterSettings = jsonSerializer.Deserialize<UpdaterJson>(updaterSettingsText);
+                AppVariables.UpdaterSettings = JsonSerializer.Deserialize<UpdaterJson>(updaterSettingsText);
 
                 Debug.WriteLine("Loaded updater settings.");
                 return true;
@@ -318,7 +310,7 @@ namespace Updater
         {
             try
             {
-                AVActions.ActionDispatcherInvoke(delegate
+                AVActions.DispatcherInvoke(delegate
                 {
                     textblock_Status.Text = textString;
                 });
@@ -331,7 +323,7 @@ namespace Updater
         {
             try
             {
-                AVActions.ActionDispatcherInvoke(delegate
+                AVActions.DispatcherInvoke(delegate
                 {
                     progressbar_Status.IsIndeterminate = isIndeterminate;
                     progressbar_Status.Value = currentProgress;
@@ -358,7 +350,7 @@ namespace Updater
                 Debug.WriteLine("Exiting updater.");
 
                 //Disable the interface
-                AVActions.ActionDispatcherInvoke(delegate
+                AVActions.DispatcherInvoke(delegate
                 {
                     this.Opacity = 0.80;
                     this.IsEnabled = false;

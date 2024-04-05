@@ -5,7 +5,7 @@ namespace Updater
     public partial class AppVariables
     {
         //Windows
-        public static WindowMain WindowMain = new WindowMain();
+        public static WindowMain WindowMain = null;
 
         //Settings
         public static UpdaterJson UpdaterSettings = new UpdaterJson();
