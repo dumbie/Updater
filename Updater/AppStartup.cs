@@ -1,24 +1,24 @@
 ﻿using ArnoldVinkCode;
-using ArnoldVinkCode.Styles;
-using System.IO;
 
 namespace Updater
 {
     public partial class App
     {
         //Application startup code
-        private void AppStartup()
+        private void AppStartup(string[] launchArgs)
         {
             try
             {
-                //Set the working directory to executable directory
-                Directory.SetCurrentDirectory(AVFunctions.ApplicationPathRoot());
+                //Set application startup arguments
+                if (launchArgs != null)
+                {
+                    AppVariables.StartupArguments = launchArgs;
+                }
 
-                //Load application styles
-                AVResourceDictionary.LoadStyles();
+                //Set the working directory to executable directory
+                AVFunctions.ApplicationUpdateWorkingPath();
 
                 //Open application window
-                AppVariables.WindowMain = new WindowMain();
                 AppVariables.WindowMain.Show();
             }
             catch { }

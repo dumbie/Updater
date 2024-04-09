@@ -30,15 +30,8 @@
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="ArnoldVinkCode">
-			<HintPath>Assembly\ArnoldVinkCode.dll</HintPath>
-			<Private>False</Private>
+			<HintPath>..\..\ArnoldVinkCode\Desktop\bin\Release\net6.0-windows10.0.19041.0\ArnoldVinkCode.dll</HintPath>
 		</Reference>
-	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="Assembly\" />
-	</ItemGroup>
-	<ItemGroup>
-	  <None Include="..\..\ArnoldVinkCode\Desktop\bin\Release\net6.0-windows10.0.19041.0\ArnoldVinkCode.dll" Link="Assembly\ArnoldVinkCode.dll" />
 	</ItemGroup>
 	<Target Name="DonePublish" AfterTargets="Publish">
 		<Exec Command="$(SolutionDir)SignToolExe.exe" />

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 
 namespace Updater
 {
@@ -9,17 +8,8 @@ namespace Updater
         {
             try
             {
-                //Resolve missing assembly dll files
-                AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolveEmbedded;
-
-                //Set application startup arguments
-                if (e.Args != null)
-                {
-                    AppVariables.StartupArguments = e.Args;
-                }
-
                 //Run application startup code
-                AppStartup();
+                AppStartup(e.Args);
             }
             catch { }
         }
