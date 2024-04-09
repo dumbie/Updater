@@ -21,9 +21,6 @@
 		<ApplicationManifest>Properties\App.manifest</ApplicationManifest>
 	</PropertyGroup>
 	<ItemGroup>
-		<None Remove="Assembly\ArnoldVinkCode.dll" />
-	</ItemGroup>
-	<ItemGroup>
 		<Resource Include="Assets\AppIcon.ico" />
 	</ItemGroup>
 	<ItemGroup>
@@ -32,13 +29,16 @@
 		</Content>
 	</ItemGroup>
 	<ItemGroup>
-		<EmbeddedResource Include="Assembly\ArnoldVinkCode.dll" />
-	</ItemGroup>
-	<ItemGroup>
 		<Reference Include="ArnoldVinkCode">
 			<HintPath>Assembly\ArnoldVinkCode.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Assembly\" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Include="..\..\ArnoldVinkCode\Desktop\bin\Release\net6.0-windows10.0.19041.0\ArnoldVinkCode.dll" Link="Assembly\ArnoldVinkCode.dll" />
 	</ItemGroup>
 	<Target Name="DonePublish" AfterTargets="Publish">
 		<Exec Command="$(SolutionDir)SignToolExe.exe" />
