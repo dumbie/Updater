@@ -122,26 +122,6 @@ namespace Updater
                     await Task.Delay(1000);
                 }
 
-                //Delete unused files
-                if (AppVariables.UpdaterSettings.FilesDelete != null)
-                {
-                    TextBlockUpdate("Deleting unused files.");
-                    foreach (string fileName in AppVariables.UpdaterSettings.FilesDelete)
-                    {
-                        File_Delete(fileName);
-                    }
-                }
-
-                //Delete unused folders
-                if (AppVariables.UpdaterSettings.FoldersDelete != null)
-                {
-                    TextBlockUpdate("Deleting unused folders.");
-                    foreach (string folderName in AppVariables.UpdaterSettings.FoldersDelete)
-                    {
-                        Directory_Delete(folderName);
-                    }
-                }
-
                 //Move files
                 if (AppVariables.UpdaterSettings.FilesMove != null)
                 {
@@ -179,6 +159,26 @@ namespace Updater
                     foreach (string[] folderName in AppVariables.UpdaterSettings.FoldersCopy)
                     {
                         Directory_Copy(folderName[0], folderName[1], true);
+                    }
+                }
+
+                //Delete unused files
+                if (AppVariables.UpdaterSettings.FilesDelete != null)
+                {
+                    TextBlockUpdate("Deleting unused files.");
+                    foreach (string fileName in AppVariables.UpdaterSettings.FilesDelete)
+                    {
+                        File_Delete(fileName);
+                    }
+                }
+
+                //Delete unused folders
+                if (AppVariables.UpdaterSettings.FoldersDelete != null)
+                {
+                    TextBlockUpdate("Deleting unused folders.");
+                    foreach (string folderName in AppVariables.UpdaterSettings.FoldersDelete)
+                    {
+                        Directory_Delete(folderName);
                     }
                 }
 
