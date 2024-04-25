@@ -1,24 +1,28 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net6.0-windows</TargetFramework>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<NoWarn>CA1416</NoWarn>
 		<OutputType>WinExe</OutputType>
-		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-		<UseWindowsForms>True</UseWindowsForms>
+		<ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
+		<ApplicationManifest>Properties\App.manifest</ApplicationManifest>
+		<StartupObject>Updater.App</StartupObject>
+	</PropertyGroup>
+	<PropertyGroup>
 		<UseWPF>True</UseWPF>
+		<UseWindowsForms>True</UseWindowsForms>
+		<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+		<ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+		<AppendRuntimeIdentifierToOutputPath>False</AppendRuntimeIdentifierToOutputPath>
+		<OutputPath>$(SolutionDir)Build\$(Configuration)\</OutputPath>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
 		<Optimize>True</Optimize>
-		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<Optimize>True</Optimize>
 		<DebugType>none</DebugType>
-	</PropertyGroup>
-	<PropertyGroup>
-		<ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
-		<StartupObject>Updater.App</StartupObject>
-		<ApplicationManifest>Properties\App.manifest</ApplicationManifest>
 	</PropertyGroup>
 	<ItemGroup>
 		<Resource Include="Assets\AppIcon.ico" />
@@ -30,7 +34,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="ArnoldVinkCode">
-			<HintPath>..\..\ArnoldVinkCode\Desktop\bin\Release\net6.0-windows10.0.19041.0\ArnoldVinkCode.dll</HintPath>
+			<HintPath>$(SolutionDir)Build\$(Configuration)\ArnoldVinkCode.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 	<Target Name="DonePublish" AfterTargets="Publish">
