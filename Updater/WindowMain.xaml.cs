@@ -39,13 +39,13 @@ namespace Updater
                     await Task.Delay(1000);
                 }
 
-                //Create resources directory
-                Directory_Create("Resources", false);
+                //Create updater directory
+                Directory_Create("Updater", false);
 
                 //Delete previous update files
                 TextBlockUpdate("Deleting update files.");
-                File_Delete("Resources/UpdaterReplace.exe");
-                File_Delete("Resources/AppUpdate.zip");
+                File_Delete("Updater/UpdaterReplace.exe");
+                File_Delete("Updater/AppUpdate.zip");
 
                 //Load current updater settings
                 if (!LoadUpdaterSettings())
@@ -67,7 +67,7 @@ namespace Updater
                         webClient.DownloadProgressChanged += WebClient_DownloadProgressChanged;
 
                         Uri downloadUri = GetPathLatestDownload(AppVariables.UpdaterSettings.UserName, AppVariables.UpdaterSettings.RepoName, AppVariables.UpdaterSettings.FileName);
-                        await webClient.DownloadFileTaskAsync(downloadUri, "Resources/AppUpdate.zip");
+                        await webClient.DownloadFileTaskAsync(downloadUri, "Updater/AppUpdate.zip");
                         Debug.WriteLine("Update file has been downloaded.");
                     }
                 }
@@ -83,9 +83,9 @@ namespace Updater
                 {
                     Debug.WriteLine("Extracting latest updater settings.");
                     TextBlockUpdate("Updating settings to the latest version.");
-                    using (ZipArchive zipArchive = ZipFile.OpenRead("Resources/AppUpdate.zip"))
+                    using (ZipArchive zipArchive = ZipFile.OpenRead("Updater/AppUpdate.zip"))
                     {
-                        ZipArchiveEntry zipFile = zipArchive.Entries.Where(x => x.FullName.ToLower().EndsWith("Resources/Updater.json".ToLower())).FirstOrDefault();
+                        ZipArchiveEntry zipFile = zipArchive.Entries.Where(x => x.FullName.ToLower().EndsWith("Updater/Updater.json".ToLower())).FirstOrDefault();
                         string extractPath = AVFunctions.StringReplaceFirst(zipFile.FullName, AppVariables.UpdaterSettings.ExtractName + "/", string.Empty, false);
                         zipFile.ExtractToFile(extractPath, true);
                     }
@@ -186,7 +186,7 @@ namespace Updater
                 try
                 {
                     TextBlockUpdate("Updating application to the latest version.");
-                    using (ZipArchive zipArchive = ZipFile.OpenRead("Resources/AppUpdate.zip"))
+                    using (ZipArchive zipArchive = ZipFile.OpenRead("Updater/AppUpdate.zip"))
                     {
                         foreach (ZipArchiveEntry zipFile in zipArchive.Entries)
                         {
@@ -230,8 +230,8 @@ namespace Updater
                                     //Rename and move updater executable
                                     if (File.Exists(extractPath) && extractPath.ToLower().EndsWith("Updater.exe".ToLower()))
                                     {
-                                        Debug.WriteLine("Renaming Updater.exe to Resources/UpdaterReplace.exe");
-                                        extractPath = extractPath.Replace("Updater.exe", "Resources/UpdaterReplace.exe");
+                                        Debug.WriteLine("Renaming Updater.exe to Updater/UpdaterReplace.exe");
+                                        extractPath = extractPath.Replace("Updater.exe", "Updater/UpdaterReplace.exe");
                                     }
 
                                     //Extract the file
@@ -275,7 +275,7 @@ namespace Updater
         {
             try
             {
-                string updaterSettingsPath = @"Resources\Updater.json";
+                string updaterSettingsPath = @"Updater\Updater.json";
                 if (!File.Exists(updaterSettingsPath))
                 {
                     return false;
@@ -357,7 +357,7 @@ namespace Updater
                 });
 
                 //Delete the update zip file
-                File_Delete("Resources/AppUpdate.zip");
+                File_Delete("Updater/AppUpdate.zip");
 
                 //Set the exit reason text message
                 TextBlockUpdate(exitMessage);

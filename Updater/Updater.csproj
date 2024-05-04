@@ -28,7 +28,7 @@
 		<Resource Include="Assets\AppIcon.ico" />
 	</ItemGroup>
 	<ItemGroup>
-		<Content Include="Resources\Updater.json">
+		<Content Include="Updater\Updater.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>
